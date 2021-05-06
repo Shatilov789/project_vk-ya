@@ -19,12 +19,14 @@ def creat_folder(id_user_vk, def_token_ya):
         headers = {'Connect-type': 'application/json', 'Authorization': f'{def_token_ya}'}
         params = {"path": f'{id_user_vk}'}
         res_ya = requests.put(url_yandex_disk_creat_folder, headers=headers, params=params)
-        dict_ya_message = res_ya.json()
 
-        if 'DiskPathPointsToExistentDirectoryError' in dict_ya_message['error']:
+        if '409' in str(res_ya) or '201' in str(res_ya):
             return f'Создана папка с именем на YandexDisk:{id_user_vk}'
+        elif '401' in str(res_ya):
+            return f'Указанный вами токен YandexDisk неверный' \
+                   f' или не предоставляет достаточных прав для заливки фотографий.'
         else:
-            return f'Ошибка: {dict_ya_message["message"]} Проверьте корректность данных!'
+            return f'Ошибка: {str(res_ya)} ==> {res_ya.json()["message"]}'
 
 def upload_foto(def_dict_vk, def_id_user, def_token_ya):
     counter = 0
